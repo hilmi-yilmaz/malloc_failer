@@ -4,14 +4,14 @@
 
 The malloc_failer let's you fail a specific malloc after X times. This can be used to check whether you have memory leaks when you exit your program because a malloc failed.
 
-It adds the following wrapper code to your code:
+It adds the following wrapper code to your code (the X is given when running this script, explained in **_Usage_**):
 
 ```C
 #include <stdlib.h>
 
 static void	*xmalloc(size_t size)
 {
-	static int fail = ${3};
+	static int fail = X;
 	static int i = 1;
 
 	if (i == fail)
@@ -67,7 +67,7 @@ int	main(void)
 		return (-1);
 	while (i < rows)
 	{
-		matrix[i] = (int *)malloc(sizeof(int) * columns); /* line 16 */
+		matrix[i] = (int *)malloc(sizeof(int) * columns); /* ----- line 16 ----- */
 		if (matrix[i] == NULL)
 			return (-1);
 		while (j < columns)
@@ -102,6 +102,10 @@ gcc -Wall -Wextra -Werror -fsanitize=address -g new_matrix.c
 ```
 
 :warning: **Make sure you are using a memory error detection tool, so that leaks can be found. Examples of such detectors are ASAN (AdressSanitizer) or Valgrind.**
+
+## :mailbox: Contribute
+
+Found a bug? Ran into a specific problem? Missing a feature? Feel free to **file a new issue** with a respective title and description on the [issue page](https://github.com/hilmi-yilmaz/malloc_failer/issues). You can also ask questions in [GitHub Discussion](https://github.com/hilmi-yilmaz/malloc_failer/discussions). 
 
 ## :blue_book: License
 [MIT](https://opensource.org/licenses/MIT)
