@@ -73,10 +73,10 @@ cat << _EOF_ > wrapper_malloc
 
 static void	*xmalloc(size_t size)
 {
-	static int fail = ${3};
+	int X = ${3};
 	static int i = 1;
 
-	if (i == fail)
+	if (i == X)
 		return (NULL);
 	i++;
 	return (malloc(size));
@@ -123,9 +123,16 @@ else
 		exit 1
 	fi
 
-	# Check that the "fail @ X malloc" parameter starts from 0. 
+	# Check that the "fail at X malloc" parameter is a positive integer. 
 	if [[ ! "$3" =~ ^[0-9]+$ ]]; then
 		echo "$3 is not a valid number to let your malloc fail at. Enter number starting from 0."
+		rm -f wrapper_malloc example
+		exit 1
+	fi
+
+	# Check for the "fail at X malloc" parameter that it isn't 0
+	if [[ "$3" == "0" ]]; then
+		echo "$3 is not a valid number at which to fail malloc. Enter number starting from 1 (1 means fail first malloc)."
 		rm -f wrapper_malloc example
 		exit 1
 	fi
