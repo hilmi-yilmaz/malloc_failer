@@ -5,51 +5,51 @@
 cat << _EOF_ > example
 Let say we have the following C program called "matrix.c":
 
-0	#include <stdlib.h>
-1
-2	int	main(void)
-3	{
-4		int	i = 0;
-5		int	j = 0;	
-6		int	rows = 4;
-7		int	columns = 4;
-8		int **matrix;
-9
-10		matrix = (int **)malloc(sizeof(int *) * rows);
-11		if (matrix == NULL)
-12			return (-1);
-13		while (i < rows)
-14		{
-15			matrix[i] = (int *)malloc(sizeof(int) * columns);
-16			if (matrix[i] == NULL)
-17				return (-1);
-18			while (j < columns)
-19			{
-20				matrix[i][j] = 0;
-21				j++;
-22			}
-23			j = 0;
-24			i++;
-25		}
-26	
-27		/* Free all data */
-28		i = 0;
-29		while (i < rows)
-30		{
-31			free(matrix[i]);
-32			i++;
-33		}
-34		free(matrix);
-35		return (0);
-36	}
+1	#include <stdlib.h>
+2
+3	int	main(void)
+4	{
+5		int	i = 0;
+6		int	j = 0;	
+7		int	rows = 4;
+8		int	columns = 4;
+9		int **matrix;
+10
+11		matrix = (int **)malloc(sizeof(int *) * rows);
+12		if (matrix == NULL)
+13			return (-1);
+14		while (i < rows)
+15		{
+16			matrix[i] = (int *)malloc(sizeof(int) * columns);
+17			if (matrix[i] == NULL)
+18				return (-1);
+19			while (j < columns)
+20			{
+21				matrix[i][j] = 0;
+22				j++;
+23			}
+24			j = 0;
+25			i++;
+26		}
+27	
+28		/* Free all data */
+29		i = 0;
+30		while (i < rows)
+31		{
+32			free(matrix[i]);
+33			i++;
+34		}
+35		free(matrix);
+36		return (0);
+37	}
 
-This program contains leaks when an allocation of matrix[i] fails when i > 0 (line 15).
+This program contains leaks when an allocation of matrix[i] fails (line 16).
 To fail this malloc at the third time, you can run:
 
-./fail_malloc.sh matrix.c 15 3
+./malloc_failer.sh matrix.c 16 3
 
 File to be tested				= matrix.c
-Line number of malloc which we want to fail	= 15
+Line number of malloc which we want to fail	= 16
 Fail the chosen malloc after X times 		= 3
 
 IMPORTANT: A new file will be created with the prefix "new_". In this case new_matrix.c.
@@ -70,7 +70,6 @@ cat << _EOF_ > wrapper_malloc
 */
 
 #include <stdlib.h>
-#include <stddef.h>
 
 static void	*xmalloc(size_t size)
 {
@@ -97,9 +96,9 @@ if [[ "$1" == "--help" && "$2" == "" ]]; then
 elif [[ "$1" == "" || "$2" == "" || "$3" == "" ]]; then
 	echo "Error."
 	echo "Use this tool as follows:"
-	echo "./fail_malloc.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
+	echo "./malloc_failer.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
 	echo ""
-	echo "To seen an example run: ./fail_malloc.sh --help"
+	echo "To seen an example run: ./malloc_failer.sh --help"
 	rm -f wrapper_malloc example
 	exit 1
 else
@@ -131,13 +130,6 @@ else
 		exit 1
 	fi
 fi
-
-# Check whether there is a malloc at the given line
-# malloc_line=$(head -n "$2" "$1" | tail -1)
-# if [[ ! "$malloc_line" =~ "malloc" ]]; then
-# 	echo "There is no malloc on the given line."
-# 	exit 1
-# fi
 
 # Make a copy of the input C file
 cp "$1" copy_${1}
