@@ -4,7 +4,7 @@
 
 The malloc_failer let's you fail a specific malloc after X times. This can be used to check whether you have memory leaks when you exit your program because a malloc failed.
 
-It adds the following wrapper code to your code (the X is given when running this script, explained in **_Usage_**):
+It adds the following wrapper code to your code (the X is given when running this script, explained in **_Usage_** section):
 
 ```C
 #include <stdlib.h>

@@ -2,7 +2,9 @@
 
 # This program places a wrapper around your malloc's and fails it after being called X times
 
-cat << _EOF_ > example
+print_example ()
+{
+cat << _EOF_
 Let say we have the following C program called "matrix.c":
 
 1	#include <stdlib.h>
@@ -56,6 +58,7 @@ IMPORTANT: A new file will be created with the prefix "new_". In this case new_m
 You can run your code as usual but now with this new file. 
 
 _EOF_
+}
 
 # The wrapper code
 cat << _EOF_ > wrapper_malloc
@@ -90,73 +93,96 @@ _EOF_
 
 # Input handling
 if [[ "$1" == "--help" && "$2" == "" ]]; then
-	cat example
-	rm -f wrapper_malloc example
+	print_example
+	rm -f wrapper_malloc
 	exit 0
+elif [[ "$1" == "--reverse" && "$2" == "" ]]; then
+
+	#Check whether .malloc_failer/ directory exists
+	if [[ ! -d .malloc_failer/ ]]; then
+		echo "There are no backup files. Run this tool first."
+		echo "Run with: ./malloc_failer.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
+		echo "Before running with --reverse."
+		rm -f wrapper_malloc
+		exit 1
+	else
+		for file_orig in .malloc_failer/* ; do
+			file=${file_orig%.orig} 			# if 	file_orig = .malloc_fail/test.c.orig
+			file=${file##*/}					# then 	file = test.c
+			cp $file_orig $file
+			rm -f $file_orig
+		done
+		rm -df .malloc_failer/ wrapper_malloc
+		exit 0
+	fi
 elif [[ "$1" == "" || "$2" == "" || "$3" == "" ]]; then
 	echo "Error."
 	echo "Use this tool as follows:"
 	echo "./malloc_failer.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
 	echo ""
 	echo "To seen an example run: ./malloc_failer.sh --help"
-	rm -f wrapper_malloc example
+	echo "To get your original files back run: ./malloc_failer.sh --reverse"
+	rm -f wrapper_malloc
 	exit 1
 else
 	# Check whether the C file exists
 	if [[ ! -e "$1" ]]; then
 		echo "$1 doesn't exist."
-		rm -f wrapper_malloc example
+		rm -f wrapper_malloc
 		exit 1
 	fi
 
 	# Check that the line number is a positive integer
 	if [[ ! "$2" =~ ^[0-9]+$ ]]; then
 		echo "$2 is not a valid line number. Enter number starting from 1."
-		rm -f wrapper_malloc example
+		rm -f wrapper_malloc
 		exit 1
 	fi
 
 	# Check for the line number that it isn't 0
 	if [[ "$2" == "0" ]]; then
 		echo "$2 is not a valid line number. Enter number starting from 1."
-		rm -f wrapper_malloc example
+		rm -f wrapper_malloc
 		exit 1
 	fi
 
 	# Check that the "fail at X malloc" parameter is a positive integer. 
 	if [[ ! "$3" =~ ^[0-9]+$ ]]; then
-		echo "$3 is not a valid number to let your malloc fail at. Enter number starting from 0."
-		rm -f wrapper_malloc example
+		echo "$3 is not a valid number to let your malloc fail at. Enter number starting from 1 (1 means fail first malloc)."
+		rm -f wrapper_malloc
 		exit 1
 	fi
 
 	# Check for the "fail at X malloc" parameter that it isn't 0
 	if [[ "$3" == "0" ]]; then
-		echo "$3 is not a valid number at which to fail malloc. Enter number starting from 1 (1 means fail first malloc)."
-		rm -f wrapper_malloc example
+		echo "$3 is not a valid number to let your malloc fail at. Enter number starting from 1 (1 means fail first malloc)."
+		rm -f wrapper_malloc
 		exit 1
 	fi
 fi
 
+# Create .malloc_failer/ directory in which we are going to store the original files
+[ ! -d .malloc_failer/ ] && mkdir .malloc_failer/
+
 # Make a copy of the input C file
-cp "$1" copy_${1}
+cp "$1" .malloc_failer/${1}.orig
 
 # Concatenate the wrapper file and the C file
-cat wrapper_malloc copy_${1} > new_${1}
+cat wrapper_malloc .malloc_failer/${1}.orig > ${1}
 
 # The new "line number" of the malloc (it changed because we added wrapper malloc at the top of the file)
 len_wrapper_file=$(wc -l < wrapper_malloc)
 malloc_line_nb=$(($2 + $len_wrapper_file))
 
 # Define malloc to be xmalloc
-head -n $(($malloc_line_nb - 1)) new_${1} > temp
+head -n $(($malloc_line_nb - 1)) ${1} > temp
 echo "#define malloc(x) xmalloc(x)" >> temp
-head -n $malloc_line_nb new_${1} | tail -1 >> temp
+head -n $malloc_line_nb ${1} | tail -1 >> temp
 echo "#undef malloc" >> temp
-tail -n "+$(($2 + 1))" copy_${1} >> temp
+tail -n "+$(($2 + 1))" .malloc_failer/${1}.orig >> temp
 
 # Set the temp to the new C file
-cat temp > new_${1}
+cat temp > ${1}
 
 # Delete temporary files
-rm -f example wrapper_malloc copy_${1} temp
+rm -f wrapper_malloc temp
