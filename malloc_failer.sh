@@ -54,8 +54,8 @@ File to be tested				= matrix.c
 Line number of malloc which we want to fail	= 16
 Fail the chosen malloc after X times 		= 3
 
-IMPORTANT: A new file will be created with the prefix "new_". In this case new_matrix.c.
-You can run your code as usual but now with this new file. 
+IMPORTANT: THE ORIGINAL FILE WILL BE MODIFIED. A COPY IS MADE IN .malloc_failer/ DIRECTORY BEFORE MODIFICATION.
+TO GET YOUR FILES BACK, RUN: ./malloc_failer.sh --reverse
 
 _EOF_
 }
@@ -100,7 +100,7 @@ elif [[ "$1" == "--reverse" && "$2" == "" ]]; then
 
 	#Check whether .malloc_failer/ directory exists
 	if [[ ! -d .malloc_failer/ ]]; then
-		echo "There are no backup files. Run this tool first."
+		echo "None of your files are changed by this tool. Run this tool first."
 		echo "Run with: ./malloc_failer.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
 		echo "Before running with --reverse."
 		rm -f wrapper_malloc

@@ -95,13 +95,21 @@ This program contains leaks when an allocation of `matrix[i]` fails (line 16). T
 ./malloc_failer.sh matrix.c 16 3
 ```
 
-This wil result in a new file with the prefix "new_", in this case the new file would be **_new_matrix.c_**. You can use this file when compiling your program, instead of the original **_matrix.c_**:
+Your original file is modified. A copy of your file is saved in the **_.malloc_failer/_** directory with the *.orig* prefix. Now you can run your program as always with a memory error detection tool, like:
 
 ```sh
-gcc -Wall -Wextra -Werror -fsanitize=address -g new_matrix.c
+gcc -Wall -Wextra -Werror -fsanitize=address -g matrix.c
 ```
 
-:warning: **Make sure you are using a memory error detection tool, so that leaks can be found. Examples of such detectors are ASAN (AdressSanitizer) or Valgrind.**
+To get your original file back, you can run:
+
+```sh
+./malloc_failer.sh --reverse
+```
+
+The reverse option makes sure your project directory is the same as before you ran the *malloc_failer*.
+
+:warning: **Make sure you are using a memory error detection tool, so that leaks can be found. Examples of such detectors are ASAN (AdressSanitizer) and Valgrind.**
 
 ## :compass: Roadmap
 - Add calloc and realloc.
