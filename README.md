@@ -103,6 +103,10 @@ gcc -Wall -Wextra -Werror -fsanitize=address -g new_matrix.c
 
 :warning: **Make sure you are using a memory error detection tool, so that leaks can be found. Examples of such detectors are ASAN (AdressSanitizer) or Valgrind.**
 
+## :compass: Roadmap
+- Add calloc and realloc.
+- Make more user friendly.
+
 ## :mailbox: Contribute
 
 Found a bug? Ran into a specific problem? Missing a feature? Feel free to **file a new issue** with a respective title and description on the [issue page](https://github.com/hilmi-yilmaz/malloc_failer/issues). You can also ask questions in [GitHub Discussion](https://github.com/hilmi-yilmaz/malloc_failer/discussions). 
