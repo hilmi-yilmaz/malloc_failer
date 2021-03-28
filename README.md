@@ -1,6 +1,6 @@
 # :smiling_imp: malloc_failer :smiling_imp:
 
-### :warning: **This tool modifies your original files. Make sure you backup all your files before using this tool. This tool comes with the option to get your original file back like nothing changed. But if something goes wrong because of a bug, it is all your responsibility.** 
+### :warning: **This tool modifies your original files. It saves copies of your files in a hidden directory. When your done using this tool, you can use the --reverse option to get your original file back. Because this tool is still being tested, make sure you make a backup of your files.** 
 
 ## :boom: Description
 
@@ -34,6 +34,8 @@ int **matrix = (int **)malloc(size); /* This would be the malloc you want to fai
 ## :gear: Installation and Setup
 
 Clone this repository. The only file you need is **_malloc_failer.sh_**, which is an executable.
+
+You can add this tool to a location in your path to use it for every project.
 
 ## :video_game: Usage
 
