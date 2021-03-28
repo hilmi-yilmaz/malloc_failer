@@ -1,10 +1,12 @@
 # :smiling_imp: malloc_failer :smiling_imp:
 
+### :warning: **This tool modifies your original files. Make sure you backup all your files before using this tool. This tool comes with the option to get your original file back like nothing changed. But if something goes wrong because of a bug, it is all your responsibility.** 
+
 ## :boom: Description
 
 The malloc_failer let's you fail a specific malloc after X times. This can be used to check whether you have memory leaks when you exit your program because a malloc failed.
 
-It adds the following wrapper code to your code (the X is given when running this script, explained in **_Usage_** section):
+It adds the following wrapper code to your code (the X is given when running this script, explained in the **_Usage_** section):
 
 ```C
 #include <stdlib.h>
@@ -118,6 +120,9 @@ The reverse option makes sure your project directory is the same as before you r
 ## :mailbox: Contribute
 
 Found a bug? Ran into a specific problem? Missing a feature? Feel free to **file a new issue** with a respective title and description on the [issue page](https://github.com/hilmi-yilmaz/malloc_failer/issues). You can also ask questions in [GitHub Discussion](https://github.com/hilmi-yilmaz/malloc_failer/discussions). 
+
+## :credit_card: Credits
+Thanks **_Tishj_** for finding some bugs and coming up with ideas for the _malloc_failer_!
 
 ## :blue_book: License
 [MIT](https://opensource.org/licenses/MIT)

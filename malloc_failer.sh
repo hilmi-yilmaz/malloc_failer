@@ -60,7 +60,7 @@ TO GET YOUR FILES BACK, RUN: ./malloc_failer.sh --reverse
 _EOF_
 }
 
-# The wrapper code
+# The malloc wrapper code
 cat << _EOF_ > wrapper_malloc
 /* ------------------------------------------------------------------------- */
 /* ---------------------------- MALLOC WRAPPER ----------------------------- */
@@ -97,14 +97,14 @@ if [[ "$1" == "--help" && "$2" == "" ]]; then
 	rm -f wrapper_malloc
 	exit 0
 elif [[ "$1" == "--reverse" && "$2" == "" ]]; then
-
-	#Check whether .malloc_failer/ directory exists
+	# Check whether .malloc_failer/ directory exists
 	if [[ ! -d .malloc_failer/ ]]; then
 		echo "None of your files are changed by this tool. Run this tool first."
 		echo "Run with: ./malloc_failer.sh [file_to_be_tested.c] [line_number_of_malloc] [at_which_malloc_to_fail]"
 		echo "Before running with --reverse."
 		rm -f wrapper_malloc
 		exit 1
+	# If it exists, cp the original file back and delete the rest
 	else
 		for file_orig in .malloc_failer/* ; do
 			file=${file_orig%.orig} 			# if 	file_orig = .malloc_fail/test.c.orig
@@ -161,6 +161,29 @@ else
 	fi
 fi
 
+# Define is_wrapper which is 1 if a wrapper is already present in the file, 0 otherwise
+is_wrapper="0"
+
+# The length of the wrapper malloc file
+len_wrapper_file=$(wc -l < wrapper_malloc)
+
+# Check whether there is a malloc protection in the file already
+head -n $len_wrapper_file $1 | diff wrapper_malloc - > /dev/null
+if [[ "$?" == "0" ]]; then
+	echo "There is already a wrapper code at the top of $1."
+	is_wrapper="1"
+
+	# Check whether the malloc line is already sandwiched by #define directive
+	directive_line_nb=$(($2 - 1))
+	if [[ $(sed -n "${directive_line_nb}p" $1) == "#define malloc(x) xmalloc(x)" ]]; then
+		echo "Malloc at line $2 is already wrapped."
+		rm -f wrapper_malloc
+		exit 1
+	fi
+	rm -f wrapper_malloc
+	exit 1
+fi
+
 # Create .malloc_failer/ directory in which we are going to store the original files
 [ ! -d .malloc_failer/ ] && mkdir .malloc_failer/
 
@@ -171,7 +194,6 @@ cp "$1" .malloc_failer/${1}.orig
 cat wrapper_malloc .malloc_failer/${1}.orig > ${1}
 
 # The new "line number" of the malloc (it changed because we added wrapper malloc at the top of the file)
-len_wrapper_file=$(wc -l < wrapper_malloc)
 malloc_line_nb=$(($2 + $len_wrapper_file))
 
 # Define malloc to be xmalloc
