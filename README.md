@@ -35,7 +35,7 @@ int **matrix = (int **)malloc(size); /* This would be the malloc you want to fai
 
 Clone this repository. The only file you need is **_malloc_failer.sh_**, which is an executable.
 
-You can add this tool to a location in your path to use it for every project.
+You can add this tool to a location in your PATH so that you can use it for every project.
 
 ## :video_game: Usage
 
