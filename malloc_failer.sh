@@ -189,6 +189,10 @@ fi
 
 # Make a copy of the input C file
 cp "$1" .malloc_failer/${1}.orig
+if [[ "$?" != "0" ]]; then
+    echo "Error happend when copying your source file."
+    exit 1
+fi
 
 # Concatenate the wrapper file and the C file
 cat wrapper_malloc .malloc_failer/${1}.orig > ${1}
